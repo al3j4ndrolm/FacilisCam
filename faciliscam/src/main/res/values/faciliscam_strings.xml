@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faciliscam_close">Close camera</string>
+    <string name="faciliscam_take_photo">Take photo</string>
+    <string name="faciliscam_switch_camera">Switch camera</string>
+    <string name="faciliscam_flash_off">Flash off</string>
+    <string name="faciliscam_flash_auto">Flash auto</string>
+    <string name="faciliscam_flash_on">Flash on</string>
+    <string name="faciliscam_permission_message">Allow camera access to take a photo.</string>
+    <string name="faciliscam_permission_allow">Allow camera</string>
+    <string name="faciliscam_permission_open_settings">Open settings</string>
+</resources>

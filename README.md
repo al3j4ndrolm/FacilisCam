@@ -26,10 +26,10 @@ Then add **one** of these dependencies:
 
 ```kotlin
 // Jetpack Compose apps: includes PhotoBox, PhotoImage, rememberPhoto, and the core library
-implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam-compose:1.1.0")
+implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam-compose:1.1.1")
 
 // Views-only apps: just camera.open { }
-implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam:1.1.0")
+implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam:1.1.1")
 ```
 
 Min SDK 23. You don't need to edit your manifest: the camera permission, the camera screen and the file provider are merged in automatically.
@@ -90,6 +90,12 @@ PhotoBox(Modifier.size(240.dp)) { photo -> upload(photo.uri) }
 ```
 
 You can customize it with `lens`, `saveTo`, `shape` (e.g. `CircleShape` for avatars), `contentScale` and `placeholder`.
+
+It works at any size. Boxes smaller than 120dp show just a camera icon, scaled to fit, with no label:
+
+```kotlin
+PhotoBox(Modifier.size(60.dp), shape = CircleShape)   // avatar-style picker
+```
 
 ### 2. `rememberPhoto()`: your own button and layout
 

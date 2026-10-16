@@ -1,4 +1,4 @@
 jdk:
   - openjdk17
 install:
-  - ./gradlew :faciliscam:publishReleasePublicationToMavenLocal
+  - ./gradlew :faciliscam:publishReleasePublicationToMavenLocal :faciliscam-compose:publishReleasePublicationToMavenLocal

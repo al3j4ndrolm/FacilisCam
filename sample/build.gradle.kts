@@ -27,7 +27,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":faciliscam"))
+    implementation(project(":faciliscam-compose"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

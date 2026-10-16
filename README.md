@@ -1,7 +1,5 @@
 # FacilisCam
 
-The camera in one line. No permissions code, no CameraX setup, no `PreviewView`, no file providers.
-
 ```kotlin
 camera.open { image ->
     imageView.setImageURI(image.uri)

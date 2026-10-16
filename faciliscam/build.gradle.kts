@@ -3,10 +3,6 @@ plugins {
     `maven-publish`
 }
 
-// JitPack serves GitHub repos under com.github.<username>.
-group = "com.github.al3j4ndrolm"
-version = "1.0.0"
-
 android {
     namespace = "io.github.al3j4ndrolm.faciliscam"
     compileSdk {

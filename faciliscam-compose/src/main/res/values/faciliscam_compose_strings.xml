@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faciliscam_compose_take_photo">Take photo</string>
+    <string name="faciliscam_compose_retake_photo">Retake photo</string>
+</resources>

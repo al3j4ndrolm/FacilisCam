@@ -72,6 +72,11 @@ private fun SampleScreen() {
                 shape = CircleShape,
             )
         }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            PhotoBox(Modifier.size(60.dp), shape = CircleShape)
+            PhotoBox(Modifier.size(40.dp), shape = CircleShape)
+            PhotoBox(Modifier.size(width = 200.dp, height = 60.dp))
+        }
         if (status.isNotEmpty()) Text(status, style = MaterialTheme.typography.bodySmall)
 
         HorizontalDivider()

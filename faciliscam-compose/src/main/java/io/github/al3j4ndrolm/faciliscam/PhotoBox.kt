@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
@@ -29,7 +30,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import io.github.al3j4ndrolm.faciliscam.compose.R
 
@@ -93,23 +96,40 @@ object PhotoBoxDefaults {
     val BackgroundColor = Color(0x1F808080)
     val ContentColor = Color(0xFF808080)
 
-    /** The default placeholder: a camera icon over "Take photo". */
+    /** Boxes smaller than this (on their shorter side) show the icon without the label. */
+    val LabelMinSize = 120.dp
+
+    /**
+     * The default placeholder: a camera icon over "Take photo". Adapts to the box: in boxes
+     * smaller than [LabelMinSize] it shows only the icon, scaled to fit.
+     */
     @Composable
     fun Placeholder(color: Color = ContentColor) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Image(
-                painter = painterResource(R.drawable.faciliscam_compose_ic_camera),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color),
-                modifier = Modifier.size(40.dp),
-            )
-            BasicText(
-                text = stringResource(R.string.faciliscam_compose_take_photo),
-                style = TextStyle(color = color, fontSize = 14.sp),
-            )
+        val label = stringResource(R.string.faciliscam_compose_take_photo)
+        BoxWithConstraints(contentAlignment = Alignment.Center) {
+            val shortSide = min(maxWidth, maxHeight)
+            if (shortSide >= LabelMinSize) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    CameraIcon(color, size = 40.dp, contentDescription = null)
+                    BasicText(text = label, style = TextStyle(color = color, fontSize = 14.sp))
+                }
+            } else {
+                // The label is hidden, so the icon carries it for screen readers.
+                CameraIcon(color, size = (shortSide * 0.4f).coerceIn(12.dp, 40.dp), contentDescription = label)
+            }
         }
+    }
+
+    @Composable
+    private fun CameraIcon(color: Color, size: Dp, contentDescription: String?) {
+        Image(
+            painter = painterResource(R.drawable.faciliscam_compose_ic_camera),
+            contentDescription = contentDescription,
+            colorFilter = ColorFilter.tint(color),
+            modifier = Modifier.size(size),
+        )
     }
 }

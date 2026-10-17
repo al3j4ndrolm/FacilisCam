@@ -3,7 +3,7 @@
 [![JitPack](https://jitpack.io/v/al3j4ndrolm/FacilisCam.svg)](https://jitpack.io/#al3j4ndrolm/FacilisCam)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**The Android camera in one line.** No permission code, no CameraX setup, no manifest edits.
+**Android camera in one line.** No permission code, no CameraX setup, no manifest edits.
 
 <!-- DEMO GIF: add docs/demo.gif here -->
 

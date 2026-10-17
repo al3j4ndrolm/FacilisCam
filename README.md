@@ -1,12 +1,43 @@
 # FacilisCam
 
+[![JitPack](https://jitpack.io/v/al3j4ndrolm/FacilisCam.svg)](https://jitpack.io/#al3j4ndrolm/FacilisCam)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+**The Android camera in one line.** No permission code, no CameraX setup, no manifest edits.
+
+<!-- DEMO GIF: add docs/demo.gif here -->
+
 ```kotlin
-camera.open { image ->
-    imageView.setImageURI(image.uri)
+camera.open { photo ->
+    imageView.setImageURI(photo.uri)
 }
 ```
 
-That's the whole integration. It works the same from an Activity, a Fragment, Jetpack Compose or a ViewModel. You don't pass a `Context` and there's no `init()`.
+Works from an Activity, Fragment, Compose or a ViewModel. No `Context`, no `init()`.
+
+## Jetpack Compose
+
+```kotlin
+PhotoBox(Modifier.size(240.dp))
+```
+
+A complete photo field: tap it, take a photo, see it. Tap again to retake.
+
+```kotlin
+PhotoBox(Modifier.size(240.dp)) { photo -> upload(photo.uri) }   // get the photo
+PhotoBox(Modifier.size(60.dp), shape = CircleShape)              // avatar picker
+```
+
+Want your own button? Use `rememberPhoto()`:
+
+```kotlin
+val photo = rememberPhoto()
+
+Button(onClick = { photo.take() }) { Text("Take photo") }
+PhotoImage(photo, Modifier.fillMaxWidth())
+```
+
+It survives rotation, even while the camera is open.
 
 ## Install
 
@@ -22,127 +53,57 @@ dependencyResolutionManagement {
 }
 ```
 
-Then add **one** of these dependencies:
+Then add one dependency (min SDK 23):
 
 ```kotlin
-// Jetpack Compose apps: includes PhotoBox, PhotoImage, rememberPhoto, and the core library
+// Compose apps: PhotoBox, PhotoImage, rememberPhoto, plus camera.open
 implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam-compose:1.1.1")
 
-// Views-only apps: just camera.open { }
+// Views apps: just camera.open
 implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam:1.1.1")
 ```
 
-Min SDK 23. You don't need to edit your manifest: the camera permission, the camera screen and the file provider are merged in automatically.
-
-## Usage
-
-```kotlin
-import io.github.al3j4ndrolm.faciliscam.camera
-
-camera.open { image -> /* use image.uri */ }
-```
-
-### Options
+## Options
 
 ```kotlin
 camera.open(
-    lens = Lens.Front,            // Lens.Back (default) or Lens.Front
-    saveTo = SaveTo.Gallery,      // SaveTo.Cache (default) or SaveTo.Gallery → Pictures/<App name>
-    onCancel = { /* user closed the camera */ },
-    onError = { error -> /* no camera, capture failed, ... */ },
-) { image ->
-    // ...
-}
+    lens = Lens.Front,          // Lens.Back (default) or Lens.Front
+    saveTo = SaveTo.Gallery,    // SaveTo.Cache (default) or SaveTo.Gallery
+    onCancel = { },             // user closed the camera
+    onError = { e -> },         // no camera, capture failed
+) { photo -> }
 ```
 
-`onPhoto` only runs when a photo was actually taken, so `image` is never null.
+Prefer coroutines? `val photo = camera.capture() ?: return` (null if cancelled).
 
-### The photo
-
-| Property | |
+| `Photo` | |
 |---|---|
-| `image.uri` | `content://` Uri. Works with `setImageURI`, Coil, Glide, and sharing via Intents |
-| `image.file` | The `File` (for `SaveTo.Cache`), or `null` for `SaveTo.Gallery` |
-| `image.bitmap(maxSize = 2048)` | A decoded `Bitmap`, rotated upright and downscaled. Reads from disk, so call it off the main thread for big sizes |
+| `photo.uri` | `content://` Uri for `setImageURI`, Coil, Glide or sharing |
+| `photo.file` | The `File` (cache), or `null` when saved to the gallery |
+| `photo.bitmap(maxSize)` | Decoded, upright, downscaled `Bitmap`. Call off the main thread |
 
-`Photo` is `Parcelable`, so you can keep it in `rememberSaveable`, a `SavedStateHandle` or a `Bundle`.
+`Photo` is `Parcelable`, so it works with `rememberSaveable` and `SavedStateHandle`.
 
-### Coroutines
+## Included
 
-```kotlin
-val image = camera.capture() ?: return   // null if the user cancelled
-```
-
-## Compose
-
-With `faciliscam-compose`, pick whichever level fits the screen:
-
-### 1. `PhotoBox`: the whole thing in one line
-
-```kotlin
-PhotoBox(Modifier.size(240.dp))
-```
-
-It shows a "Take photo" placeholder, opens the camera when tapped, then shows the photo. Tap it again to retake. To use the photo:
-
-```kotlin
-PhotoBox(Modifier.size(240.dp)) { photo -> upload(photo.uri) }
-```
-
-You can customize it with `lens`, `saveTo`, `shape` (e.g. `CircleShape` for avatars), `contentScale` and `placeholder`.
-
-It works at any size. Boxes smaller than 120dp show just a camera icon, scaled to fit, with no label:
-
-```kotlin
-PhotoBox(Modifier.size(60.dp), shape = CircleShape)   // avatar-style picker
-```
-
-### 2. `rememberPhoto()`: your own button and layout
-
-```kotlin
-val photo = rememberPhoto()
-
-Button(onClick = { photo.take() }) { Text("Take photo") }
-PhotoImage(photo, Modifier.fillMaxWidth())
-```
-
-`photo.value` is the current `Photo?`. `photo.take(lens = Lens.Front)` opens the selfie camera, and `photo.clear()` resets it. The state survives rotation, even if the user rotates while the camera is open.
-
-### 3. `PhotoImage`: just display it
-
-```kotlin
-var photo by rememberSaveable { mutableStateOf<Photo?>(null) }
-
-Button(onClick = { camera.open { photo = it } }) { Text("Take photo") }
-PhotoImage(photo, Modifier.fillMaxWidth())
-```
-
-`PhotoImage` decodes in the background, upright and sized for the screen, and draws nothing while the photo is `null`. `Photo` is `Parcelable`, so `rememberSaveable` works as shown.
-
-## What you get for free
-
-- Camera permission request, a re-ask button after denial, and an **Open settings** button once the user picks "don't ask again"
-- Full-screen preview with tap-to-focus and pinch-to-zoom
-- Flash (off / auto / on), shown only when the camera has one
-- Front/back switch, shown only when the device has both
-- Photos saved upright with the right rotation, and front-camera photos mirrored to match the preview
-- Results delivered once your screen is resumed, so it's safe to navigate or commit fragments in the callback
+- Permission request, with an **Open settings** button if the user blocks it
+- Preview with tap-to-focus and pinch-to-zoom
+- Flash and front/back switch, shown only when the device has them
+- Photos saved upright; front-camera photos mirrored to match the preview
 
 ## Good to know
 
-- If Android kills your app's process while the camera is open (rare, and mostly on low-memory devices), the callback is lost along with the rest of the process.
-- The callback runs on the screen instance that called `open`. If that screen is recreated while the camera is open (for example, your screen isn't orientation-locked and the user rotates the phone), keep the result in a `ViewModel` or `rememberSaveable`, like any other state. In Compose, `rememberPhoto()` and `PhotoBox` handle this for you.
+- If Android kills your process while the camera is open, the callback is lost with it.
+- If your screen is recreated while the camera is open, keep the result in a `ViewModel` or `rememberSaveable`. `rememberPhoto()` and `PhotoBox` do this for you.
 
-## Project layout
-
-```
-faciliscam/           core library: camera.open { }
-faciliscam-compose/   Compose components: PhotoBox, PhotoImage, rememberPhoto
-sample/               demo app
-```
-
-Build and test:
+## Contributing
 
 ```bash
 ./gradlew :faciliscam:testDebugUnitTest :faciliscam-compose:assembleRelease :sample:assembleDebug
 ```
+
+`faciliscam/` is the core library, `faciliscam-compose/` the Compose components, and `sample/` a demo app.
+
+## License
+
+[MIT](LICENSE)

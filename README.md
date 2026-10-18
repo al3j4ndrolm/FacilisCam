@@ -1,6 +1,7 @@
 # FacilisCam
 
 [![JitPack](https://jitpack.io/v/al3j4ndrolm/FacilisCam.svg)](https://jitpack.io/#al3j4ndrolm/FacilisCam)
+[![Build](https://github.com/al3j4ndrolm/FacilisCam/actions/workflows/build.yml/badge.svg)](https://github.com/al3j4ndrolm/FacilisCam/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Android camera in one line.** No permission code, no CameraX setup, no manifest edits.
@@ -16,6 +17,71 @@ camera.open { photo ->
 ```
 
 Works from an Activity, Fragment, Compose or a ViewModel. No `Context`, no `init()`.
+
+<details>
+<summary><b>Why not plain CameraX?</b></summary>
+
+The shortest working photo screen with CameraX in Compose is about 50 lines plus imports, and this version still has no flash, no camera switch, no "don't ask again" handling, no `FileProvider` for sharing, no EXIF rotation fix and no manifest entries:
+
+```kotlin
+@Composable
+fun RawCamera(onPhoto: (Uri) -> Unit) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var granted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
+        )
+    }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted = it }
+    LaunchedEffect(Unit) { if (!granted) launcher.launch(Manifest.permission.CAMERA) }
+
+    if (!granted) {
+        Text("Camera permission needed")
+        return
+    }
+
+    val imageCapture = remember { ImageCapture.Builder().build() }
+
+    Box(Modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { ctx ->
+                PreviewView(ctx).also { previewView ->
+                    val providerFuture = ProcessCameraProvider.getInstance(ctx)
+                    providerFuture.addListener({
+                        val preview = Preview.Builder().build()
+                            .also { it.surfaceProvider = previewView.surfaceProvider }
+                        providerFuture.get().apply {
+                            unbindAll()
+                            bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+                        }
+                    }, ContextCompat.getMainExecutor(ctx))
+                }
+            },
+        )
+        Button(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onClick = {
+                val file = File(context.cacheDir, "${System.currentTimeMillis()}.jpg")
+                imageCapture.takePicture(
+                    ImageCapture.OutputFileOptions.Builder(file).build(),
+                    ContextCompat.getMainExecutor(context),
+                    object : ImageCapture.OnImageSavedCallback {
+                        override fun onImageSaved(output: ImageCapture.OutputFileResults) = onPhoto(Uri.fromFile(file))
+                        override fun onError(e: ImageCaptureException) { Log.e("Camera", "Capture failed", e) }
+                    },
+                )
+            },
+        ) { Text("Take photo") }
+    }
+}
+```
+
+With FacilisCam, all of that is one line: `camera.open { photo -> }`.
+
+</details>
 
 ## Jetpack Compose
 

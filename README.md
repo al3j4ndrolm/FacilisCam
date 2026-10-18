@@ -5,7 +5,9 @@
 
 **Android camera in one line.** No permission code, no CameraX setup, no manifest edits.
 
-<!-- DEMO GIF: add docs/demo.gif here -->
+<p align="center">
+  <img src="docs/demo.gif" alt="Tap a PhotoBox, the camera opens, take a photo, and it appears in the box" width="270">
+</p>
 
 ```kotlin
 camera.open { photo ->

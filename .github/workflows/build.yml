@@ -16,4 +16,4 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
       - name: Build and test
-        run: ./gradlew :faciliscam:testDebugUnitTest :faciliscam-compose:assembleRelease :sample:assembleDebug --console=plain
+        run: ./gradlew :faciliscam:testDebugUnitTest :faciliscam-scan:testDebugUnitTest :faciliscam-compose:assembleRelease :faciliscam-scan:assembleRelease :sample:assembleDebug --console=plain

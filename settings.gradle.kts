@@ -25,4 +25,5 @@ dependencyResolutionManagement {
 rootProject.name = "FacilisCam"
 include(":faciliscam")
 include(":faciliscam-compose")
+include(":faciliscam-scan")
 include(":sample")

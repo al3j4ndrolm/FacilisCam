@@ -4,7 +4,7 @@
 [![Build](https://github.com/al3j4ndrolm/FacilisCam/actions/workflows/build.yml/badge.svg)](https://github.com/al3j4ndrolm/FacilisCam/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Android camera in one line.** No permission code, no CameraX setup, no manifest edits.
+**Android camera in one line.** Photos, QR codes and barcodes. No permission code, no CameraX setup, no manifest edits.
 
 <p align="center">
   <img src="docs/demo.gif" alt="Tap a PhotoBox, the camera opens, take a photo, and it appears in the box" width="270">
@@ -107,6 +107,39 @@ PhotoImage(photo, Modifier.fillMaxWidth())
 
 It survives rotation, even while the camera is open.
 
+## QR codes and barcodes
+
+```kotlin
+camera.scan { code ->
+    println(code.value)          // "https://sjsu.edu"
+}
+```
+
+A full-screen scanner opens, reads the first code it sees (with a vibration and a green outline) and closes. Coroutines: `val code = camera.scanCode() ?: return`.
+
+Codes come back already understood:
+
+```kotlin
+when (code) {
+    is Code.Url -> openBrowser(code.url)
+    is Code.Wifi -> connect(code.ssid, code.password)
+    is Code.Contact -> save(code.name, code.phones, code.emails)
+    is Code.Product -> lookUp(code.value)               // EAN/UPC on store products
+    else -> show(code.value)                             // Email, Phone, Sms, Location, Text
+}
+```
+
+Scanning many things in a row (inventory, tickets, attendance)? Put a live `Scanner` in your screen:
+
+```kotlin
+Scanner(
+    modifier = Modifier.fillMaxWidth().height(240.dp),
+    onCode = { code -> items += code.value },
+)
+```
+
+Only looking for some kinds? `formats = setOf(Format.QR)` or `Format.Products` scans faster. Reads QR, Data Matrix, Aztec, PDF417, EAN-13/8, UPC-A/E, Code 128/39/93, Codabar and ITF.
+
 ## Install
 
 Add JitPack to `settings.gradle.kts`:
@@ -121,14 +154,17 @@ dependencyResolutionManagement {
 }
 ```
 
-Then add one dependency (min SDK 23):
+Then add what you need (min SDK 23):
 
 ```kotlin
 // Compose apps: PhotoBox, PhotoImage, rememberPhoto, plus camera.open
-implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam-compose:1.1.1")
+implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam-compose:1.2.0")
 
 // Views apps: just camera.open
-implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam:1.1.1")
+implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam:1.2.0")
+
+// QR codes and barcodes: camera.scan and Scanner (adds about 2.4 MB)
+implementation("com.github.al3j4ndrolm.FacilisCam:faciliscam-scan:1.2.0")
 ```
 
 ## Options
@@ -158,19 +194,22 @@ Prefer coroutines? `val photo = camera.capture() ?: return` (null if cancelled).
 - Preview with tap-to-focus and pinch-to-zoom
 - Flash and front/back switch, shown only when the device has them
 - Photos saved upright; front-camera photos mirrored to match the preview
+- Scanner with a flashlight button; one-line barcodes must read the same twice in a row, so blurry frames don't give wrong numbers
 
 ## Good to know
 
 - If Android kills your process while the camera is open, the callback is lost with it.
 - If your screen is recreated while the camera is open, keep the result in a `ViewModel` or `rememberSaveable`. `rememberPhoto()` and `PhotoBox` do this for you.
+- Scanning uses Google's ML Kit with the model bundled in your app, so it works offline and on phones without Google Play services.
+- `Scanner` reports a code again if it comes back into view after 2 seconds (`repeatAfterMillis`). Keep a `Set` if you only want each code once.
 
 ## Contributing
 
 ```bash
-./gradlew :faciliscam:testDebugUnitTest :faciliscam-compose:assembleRelease :sample:assembleDebug
+./gradlew :faciliscam:testDebugUnitTest :faciliscam-scan:testDebugUnitTest :faciliscam-compose:assembleRelease :faciliscam-scan:assembleRelease :sample:assembleDebug
 ```
 
-`faciliscam/` is the core library, `faciliscam-compose/` the Compose components, and `sample/` a demo app.
+`faciliscam/` is the core library, `faciliscam-compose/` the Compose components, `faciliscam-scan/` the QR code and barcode scanner, and `sample/` a demo app.
 
 ## License
 

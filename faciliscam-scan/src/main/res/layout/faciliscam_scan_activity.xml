@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/faciliscam_scan_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <io.github.al3j4ndrolm.faciliscam.ViewfinderView
+        android:id="@+id/faciliscam_scan_viewfinder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:id="@+id/faciliscam_scan_controls"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/faciliscam_scan_close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="16dp"
+            android:background="@drawable/faciliscam_round_button"
+            android:contentDescription="@string/faciliscam_scan_close"
+            android:src="@drawable/faciliscam_ic_close" />
+
+        <ImageButton
+            android:id="@+id/faciliscam_scan_torch"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:background="@drawable/faciliscam_round_button"
+            android:contentDescription="@string/faciliscam_scan_torch_on"
+            android:src="@drawable/faciliscam_scan_ic_torch_off"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/faciliscam_scan_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="64dp"
+            android:background="@drawable/faciliscam_scan_pill"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:text="@string/faciliscam_scan_hint"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/faciliscam_scan_permission_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/faciliscam_scan_permission_message"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/faciliscam_scan_permission_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

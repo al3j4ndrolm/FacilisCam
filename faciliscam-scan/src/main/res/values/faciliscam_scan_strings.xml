@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faciliscam_scan_hint">Point at a QR code or barcode</string>
+    <string name="faciliscam_scan_torch_on">Turn on flashlight</string>
+    <string name="faciliscam_scan_torch_off">Turn off flashlight</string>
+    <string name="faciliscam_scan_close">Close scanner</string>
+    <string name="faciliscam_scan_permission_message">Allow camera access to scan codes.</string>
+</resources>
